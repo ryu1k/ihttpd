@@ -121,3 +121,9 @@ void IHTTPD::Daemon::close_()
     // close completed.
     sp_ = -1;
 }
+
+
+bool IHTTPD::Daemon::accept_one()
+{
+    return false;
+}

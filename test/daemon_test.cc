@@ -17,6 +17,7 @@ public:
     static void constrcutor();
     static void run_stop();
     static void listen_();
+    static void accept_();
     static void close_();
 };
 
@@ -167,11 +168,50 @@ void DaemonTest::listen_()
         ASSERT_NE(-1, daemon3.sp_);
     }
 #endif // of #ifdef TEST_WITH_WAIT
-
 }
-
 #undef TRL_
 #define TRL_(...)
+
+
+void* DaemonTest_accpet_accessor(void* arg)
+{
+    // connect must be successful.
+    namespace asio = boost::asio;
+    asio::io_service io_service;
+    asio::ip::tcp::socket socket(io_service);
+    boost::system::error_code error;
+
+    socket.connect(asio::ip::tcp::endpoint( asio::ip::address::from_string("127.0.0.1"), 56789),
+                   error);
+    sleepmsec(100);
+
+    uint64_t is_ok = ! error;
+    return reinterpret_cast<void*>(is_ok);
+}
+
+
+TEST(DaemonTest, accept_) {
+    DaemonTest::accept_();
+}
+void DaemonTest::accept_()
+{
+    Daemon daemon("127.0.0.1", 56789);
+    ASSERT_TRUE( daemon.listen_() );
+
+    // launch accessor.
+    pthread_t th;
+    ASSERT_EQ(0, pthread_create(&th, NULL, daemon_test_run_daemon, &daemon) );
+
+    // need successful accept.
+    MsecTimer timer;
+    ASSERT_EQ(true, daemon.accept_one());
+
+    // must have completed in 50 msec.
+    ASSERT_GT(static_cast<uint>(50), timer.now());
+
+    // connect to daemon by thread must be successful.
+    ASSERT_EQ(1, pthread_join(th, NULL));
+}
 
 
 TEST(DaemonTest, close_) {
