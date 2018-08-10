@@ -4,6 +4,8 @@ TARGETS = test_itself_test test_itself_b_test
 
 
 GTEST_BASE_SRC=googletest
+GTEST_INCLUDES=-I. -I${GTEST_BASE_SRC}/googletest/include -I${GTEST_BASE_SRC}/googlemock/include
+
 GTEST_ALL_CXX=${GTEST_BASE_SRC}/build/googlemock/gtest/libgtest.a
 GTEST_MAIN=${GTEST_BASE_SRC}/build/googlemock/gtest/libgtest_main.a
 GTEST_LIBS=-lpthread
