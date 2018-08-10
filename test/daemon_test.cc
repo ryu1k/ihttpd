@@ -15,6 +15,7 @@ class IHTTPD::Test::DaemonTest : public ::testing::Test
 public:
     static void constrcutor();
     static void run_stop();
+    static void listen_();
     static void close_();
 };
 
@@ -83,6 +84,74 @@ void DaemonTest::run_stop()
 
     ASSERT_EQ(0, pthread_join(th, NULL));
 }
+
+
+TEST(DaemonTest, listen_) {
+    DaemonTest::listen_();
+}
+void DaemonTest::listen_()
+{
+    { // good argument.
+        Daemon daemon("127.0.0.1", 56789);
+        ASSERT_EQ(-1, daemon.sp_);
+        ASSERT_EQ(true, daemon.listen_());
+        ASSERT_NE(-1, daemon.sp_);
+    }
+
+    { // good argument. previous resource must be closed.
+        Daemon daemon("127.0.0.1", 56789);
+        ASSERT_EQ(-1, daemon.sp_);
+        ASSERT_EQ(true, daemon.listen_());
+        ASSERT_NE(-1, daemon.sp_);
+    }
+
+    { // not numeric
+        Daemon daemon("localhost", 45678);
+        ASSERT_EQ(-1, daemon.sp_);
+        ASSERT_EQ(true, daemon.listen_());
+        ASSERT_NE(-1, daemon.sp_);
+    }
+
+    { // invalid addr.
+        Daemon daemon("255.255.255.255", 0); // must fail.
+        ASSERT_EQ(-1, daemon.sp_);
+        ASSERT_EQ(false, daemon.listen_());
+        ASSERT_EQ(-1, daemon.sp_);
+    }
+
+    { // check opening of the por indirectly by opening the port twice.
+        Daemon daemon("127.0.0.1", 56789);
+        ASSERT_EQ(-1, daemon.sp_);
+        ASSERT_EQ(true, daemon.listen_());
+        ASSERT_NE(-1, daemon.sp_);
+
+        Daemon daemon2("127.0.0.1", 56789);
+        ASSERT_EQ(-1, daemon2.sp_);
+        ASSERT_EQ(false, daemon2.listen_()); // must fail
+        ASSERT_EQ(-1, daemon2.sp_);
+    }
+
+
+    { // check opening of the por indirectly by opening the port twice.
+        Daemon daemon("127.0.0.1", 56789);
+        ASSERT_EQ(-1, daemon.sp_);
+        ASSERT_EQ(true, daemon.listen_());
+        ASSERT_NE(-1, daemon.sp_);
+
+        daemon.run();
+        sleepmsec(daemon.tick_msec_);
+        daemon.stop(); // closed by stop.
+        sleepmsec(daemon.tick_msec_ * 3);
+        ASSERT_EQ(-1, daemon.sp_); // must be closed.
+
+        Daemon daemon2("127.0.0.1", 56789);
+        ASSERT_EQ(-1, daemon2.sp_);
+        ASSERT_EQ(true, daemon2.listen_()); // must be able to re-open.
+        ASSERT_NE(-1, daemon2.sp_);
+    }
+}
+
+
 TEST(DaemonTest, close_) {
     DaemonTest::close_();
 }

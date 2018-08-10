@@ -31,7 +31,7 @@ bool IHTTPD::Daemon::run()
         // TRX_("working...\n");
         sleepmsec( tick_msec_);
     }
-
+ 
     close_();
 
     return true;
@@ -40,6 +40,12 @@ bool IHTTPD::Daemon::run()
 void IHTTPD::Daemon::stop()
 {
     running_ = false;
+}
+
+
+bool IHTTPD::Daemon::listen_()
+{
+    return true;
 }
 
 void IHTTPD::Daemon::close_()
