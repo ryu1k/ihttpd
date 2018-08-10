@@ -24,7 +24,7 @@ def:
 	@echo 
 
 init:
-	git clone git@github.com:google/googletest.git
+	git clone https://github.com/google/googletest.git
 	mkdir googletest/build
 	cd googletest/build; \
 	  cmake ..; \
