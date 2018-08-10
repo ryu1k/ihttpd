@@ -10,8 +10,8 @@ GTEST_ALL_CXX=${GTEST_BASE_SRC}/build/googlemock/gtest/libgtest.a
 GTEST_MAIN=${GTEST_BASE_SRC}/build/googlemock/gtest/libgtest_main.a
 GTEST_LIBS=-lpthread
 
+GTEST_CFLAGS=-Wall ${GTEST_INCLUDES}
 GTEST_DRIVERS=${GTEST_ALL_CXX} ${GTEST_MAIN} ${GTEST_LIBS}
-
 
 TARGETS_CXX=${TARGETS:%=%.cc} 
 
@@ -24,7 +24,7 @@ def:
 	@echo 
 
 init:
-	git clone git@github.com:google/googletest.git
+	git clone https://github.com/google/googletest.git
 	mkdir googletest/build
 	cd googletest/build; \
 	  cmake ..; \
@@ -44,7 +44,7 @@ all-from-scratch:
 
 .PHONY: test-all
 test-all:
-	g++ -o test-all -I. -I${GTEST_BASE_SRC} ${TARGETS_CXX} ${GTEST_DRIVERS}
+	g++ -o test-all ${GTEST_CFLAGS} ${TARGETS_CXX} ${GTEST_DRIVERS}
 	./test-all
 
 
@@ -54,6 +54,6 @@ test-each:
 	done
 
 test-one:
-	g++ -o ${T} -I. -I${GTEST_BASE_SRC} ${T}.cc ${GTEST_DRIVERS}
+	g++ -o ${T} ${GTEST_CFLAGS} ${T}.cc ${GTEST_DRIVERS}
 	./${T}
 
