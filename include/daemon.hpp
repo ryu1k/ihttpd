@@ -23,7 +23,7 @@ protected:
     void close_();
 
     bool accept_one();
-    bool process_one();
+    bool process_one(int newsp);
 
     int sp_;
     bool running_;

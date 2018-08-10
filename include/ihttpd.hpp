@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <time.h>
 
 namespace IHTTPD {
     class Daemon; // Handle incoming connection and pass it to worker.
@@ -14,6 +15,8 @@ namespace IHTTPD {
 
     // in utils.cc
     class MsecTimer;
+
+    void msec2timespec(uint32_t msec, struct timespec* ts);
     int sleepmsec(uint32_t msec); // sleep mili-seconds.
 };
 

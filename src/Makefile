@@ -1,6 +1,6 @@
 
 
-CXXSRCS = ihttpd utils
+CXXSRCS = ihttpd utils daemon
 
 OBJS = ${CXXSRCS:%=%.o}
 
@@ -19,7 +19,7 @@ clean:
 	rm -f ihttpd ${OBJS}
 
 ihttpd: ${OBJS}
-	g++ ${CXXFLAGS} -o $@ $< ${LIBS}
+	g++ ${CXXFLAGS} -o $@ ${OBJS} ${LIBS}
 
 %.o: %.cc ../include/%.hpp
 	g++ ${CXXFLAGS} -c -o $@ $< 
