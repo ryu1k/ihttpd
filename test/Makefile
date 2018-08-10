@@ -1,10 +1,11 @@
 
 
-TARGETS = test_itself_test test_itself_b_test
-
+# TARGETS = test_itself_test test_itself_b_test
+TARGETS = daemon_test
 
 GTEST_BASE_SRC=googletest
-GTEST_INCLUDES=-I. -I${GTEST_BASE_SRC}/googletest/include -I${GTEST_BASE_SRC}/googlemock/include
+GTEST_INCLUDES=-I. -I../include \
+	-I${GTEST_BASE_SRC}/googletest/include -I${GTEST_BASE_SRC}/googlemock/include
 
 GTEST_ALL_CXX=${GTEST_BASE_SRC}/build/googlemock/gtest/libgtest.a
 GTEST_MAIN=${GTEST_BASE_SRC}/build/googlemock/gtest/libgtest_main.a
@@ -15,7 +16,10 @@ GTEST_DRIVERS=${GTEST_ALL_CXX} ${GTEST_MAIN} ${GTEST_LIBS}
 
 TARGETS_CXX=${TARGETS:%=%.cc} 
 
-def:
+def: test-all
+
+
+help:
 	@echo "targets"
 	@echo "  make init  : prepare libgtest.a and so on." 
 	@echo "  make clean-googletest : clean libgtest.a and so on."
