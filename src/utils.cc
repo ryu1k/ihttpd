@@ -3,6 +3,7 @@
 #include "utils.hpp"
 
 #include <time.h>
+#include <unistd.h>
 
 void IHTTPD::msec2timespec(uint32_t msec, struct timespec* ts_)
 {

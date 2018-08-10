@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <poll.h>
 
 #include <boost/format.hpp>
 
@@ -122,8 +123,47 @@ void IHTTPD::Daemon::close_()
     sp_ = -1;
 }
 
-
+// @retval : true: no error, false: error. must exit.
 bool IHTTPD::Daemon::accept_one()
 {
+    struct pollfd fds[1];
+
+    fds[0].fd = sp_;
+    fds[0].events = POLLIN;
+    fds[0].revents = 0;
+
+    if( ! poll(fds, 1, tick_msec_) ) {
+        // no incoming connection.
+        TRI_("no incoming.\n");
+        return true;
+    }
+
+    // incoming connection comes.
+    int newsp = ::accept(sp_, NULL, NULL);
+    if( -1 !=  newsp) {
+        // We got a good sp.
+        if( process_one(newsp) ) {
+            return true;
+        } else {
+            TRE_("failed to process newsp.\n");
+            return false;
+        }
+    }
+
+    // something NG.
+    int err = errno;
+    if( err == EAGAIN || err == EWOULDBLOCK || err == EINTR) {
+        TRI_("Failed to accept but not serious. continue to listen.\n");
+        return true;
+    }
+
+    TRE_("failed to accept. something bad. errno=%d\n", err);
     return false;
+}
+
+// @retval : true: no error, false: error. must exit.
+bool IHTTPD::Daemon::process_one(int newsp)
+{
+    TRI_("accepted sp=%d\n", newsp);
+    return true;
 }

@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <time.h>
 
 namespace IHTTPD {
     class Daemon; // Handle incoming connection and pass it to worker.

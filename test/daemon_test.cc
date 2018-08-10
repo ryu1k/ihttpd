@@ -96,6 +96,8 @@ TEST(DaemonTest, listen_) {
 }
 void DaemonTest::listen_()
 {
+    ASSERT_FALSE(true) << "!!! set nonblock !!!";
+
     {
         TRL_("good argument.\n");
         Daemon daemon("127.0.0.1", 56789);
@@ -173,7 +175,7 @@ void DaemonTest::listen_()
 #define TRL_(...)
 
 
-void* DaemonTest_accpet_accessor(void* arg)
+void* DaemonTest_accpet_accessor(void* arg_)
 {
     // connect must be successful.
     namespace asio = boost::asio;
@@ -186,10 +188,13 @@ void* DaemonTest_accpet_accessor(void* arg)
     sleepmsec(100);
 
     uint64_t is_ok = ! error;
-    return reinterpret_cast<void*>(is_ok);
+    TRI_(" connect is_ok=%lu\n", is_ok);
+
+    pthread_exit( reinterpret_cast<void*>(is_ok) );
+    return NULL;
 }
 
-
+#if 1 //def TEST_WITH_WAIT
 TEST(DaemonTest, accept_) {
     DaemonTest::accept_();
 }
@@ -198,20 +203,32 @@ void DaemonTest::accept_()
     Daemon daemon("127.0.0.1", 56789);
     ASSERT_TRUE( daemon.listen_() );
 
+    // no connection.
+    MsecTimer timer;
+    ASSERT_EQ(true, daemon.accept_one());
+    ASSERT_EQ(true, daemon.accept_one());
+
+    // tick * 1.8 < elapsed < tick * 2.2
+    ASSERT_LT(static_cast<uint>(daemon.tick_msec_ * 2 * 0.9), timer.now());
+    ASSERT_GT(static_cast<uint>(daemon.tick_msec_ * 2 * 1.1), timer.now());
+
     // launch accessor.
     pthread_t th;
-    ASSERT_EQ(0, pthread_create(&th, NULL, daemon_test_run_daemon, &daemon) );
+    ASSERT_EQ(0, pthread_create(&th, NULL, DaemonTest_accpet_accessor, NULL));
 
     // need successful accept.
-    MsecTimer timer;
+    timer.start();
     ASSERT_EQ(true, daemon.accept_one());
 
     // must have completed in 50 msec.
     ASSERT_GT(static_cast<uint>(50), timer.now());
 
     // connect to daemon by thread must be successful.
-    ASSERT_EQ(1, pthread_join(th, NULL));
+    void* retval = NULL;
+    ASSERT_EQ(0, pthread_join(th, &retval));
+    ASSERT_EQ(1, static_cast<int>(reinterpret_cast<uint64_t>(retval)));
 }
+#endif // of #ifdef TEST_WITH_WAIT
 
 
 TEST(DaemonTest, close_) {
