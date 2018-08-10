@@ -5,7 +5,7 @@ CXXSRCS = ihttpd
 OBJS = ${CXXSRCS:%=%.o}
 
 INCLUDES = -I../include
-
+LIBS = -lboost_timer
 CXXFLAGS = -Wall ${INCLUDES}
 
 make: ihttpd
@@ -19,7 +19,7 @@ clean:
 	rm -f ihttpd ${OBJS}
 
 ihttpd: ${OBJS}
-	g++ ${CXXFLAGS} -o $@ $<
+	g++ ${CXXFLAGS} -o $@ $< ${LIBS}
 
 %.o: %.cc ../include/%.hpp
 	g++ ${CXXFLAGS} -c -o $@ $< 

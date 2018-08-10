@@ -9,9 +9,11 @@ namespace IHTTPD {
     // for test
     namespace Test {
         class DaemonTest;
+        class MsecTimerTest;
     };
 
     // in utils.cc
+    class MsecTimer;
     int sleepmsec(uint32_t msec); // sleep mili-seconds.
 };
 

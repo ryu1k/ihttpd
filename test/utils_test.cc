@@ -150,5 +150,42 @@ TEST(utils, sleepmsec_wait1100) {
     // tear down.
     ASSERT_EQ(0, pthread_join(th, NULL));
 }
+#endif // of #ifdef TEST_WITH_WAIT
 
-#endif // of #ifdef TEST_DYNAMIC
+#if 1 // def TEST_WITH_WAIT
+TEST(utils, MsecTimer) {
+
+    // start with measuring.
+    IHTTPD::MsecTimer timer;
+    ASSERT_EQ(false, timer.is_stopped());
+
+    // wait 200 msec. now() must be 150 < now() < 250
+    sleepmsec(200);
+    ASSERT_LT(150, static_cast<int>(timer.now()) );
+    ASSERT_GT(250, static_cast<int>(timer.now()) );
+
+    // pause. now() return same value while pausing.
+    timer.stop();
+    ASSERT_EQ(false, timer.is_stopped());
+    sleepmsec(200);
+    ASSERT_GT(250, static_cast<int>(timer.now()) );
+
+    // restart. and wait 200 msec. now() must be 350 < now() 450.
+    timer.resume();
+    sleepmsec(200);
+    ASSERT_LT( 350, static_cast<int>(timer.now()) );
+    ASSERT_GT( 450, static_cast<int>(timer.now()) );
+
+    // reset. now() < 50
+    timer.start();
+    ASSERT_GT( 50, static_cast<int>(timer.now()) );
+
+    // check again.
+    sleepmsec(200);
+    ASSERT_LT( 150, static_cast<int>(timer.now()) );
+    ASSERT_GT( 250, static_cast<int>(timer.now()) );
+}
+#endif // of #ifdef TEST_WITH_WAIT
+
+
+

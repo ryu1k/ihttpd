@@ -9,8 +9,6 @@
 // Accept incoming connections and put it to worker.
 class IHTTPD::Daemon
 {
-    friend IHTTPD::Test::DaemonTest;
-
     enum { DEFAULT_TICK_MSEC=100 };
 
 public:
@@ -31,4 +29,6 @@ protected:
     const std::string hostname_;
     const ushort port_;
     const int tick_msec_;
+
+    friend IHTTPD::Test::DaemonTest;
 };
