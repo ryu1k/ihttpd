@@ -1,6 +1,6 @@
 
-#include <ihttpd.hpp>
-#include <daemon.hpp>
+#include "ihttpd.hpp"
+#include "daemon.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -8,6 +8,8 @@
 #include <netdb.h>
 
 #include <boost/format.hpp>
+
+#include "utils.hpp"
 
 // #define TRACE_DAEMON_DETAIL
 #ifdef TRACE_DAEMON_DETAIL
@@ -18,7 +20,7 @@
     } while(0)
 #endif
 
-IHTTPD::Daemon::Daemon(const std::string& hostname, ushort port, int tick_msec/*=100*/)
+IHTTPD::Daemon::Daemon(const std::string& hostname, ushort port, uint tick_msec/*=100*/)
     : sp_(-1), running_(false),
       hostname_(hostname), port_(port), tick_msec_(tick_msec)
 {

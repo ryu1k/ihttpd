@@ -1,6 +1,6 @@
 
 
-CXXSRCS = ihttpd
+CXXSRCS = ihttpd utils
 
 OBJS = ${CXXSRCS:%=%.o}
 

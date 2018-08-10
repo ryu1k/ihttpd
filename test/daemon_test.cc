@@ -29,7 +29,7 @@ void DaemonTest::constrcutor()
 
     const std::string host("test-host-name");
     const ushort port = 56789;
-    int tick = 50;
+    uint tick = 50;
 
     // Is value set exactly ?
     Daemon daemon1(host, port, tick);
