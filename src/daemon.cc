@@ -20,6 +20,7 @@ IHTTPD::Daemon::Daemon(const std::string& hostname, ushort port, int tick_msec/*
 
 IHTTPD::Daemon::~Daemon()
 {
+    close_();
 }
 
 bool IHTTPD::Daemon::run()
@@ -31,10 +32,29 @@ bool IHTTPD::Daemon::run()
         sleepmsec( tick_msec_);
     }
 
+    close_();
+
     return true;
 }
 
 void IHTTPD::Daemon::stop()
 {
     running_ = false;
+}
+
+void IHTTPD::Daemon::close_()
+{
+    if( -1 == sp_ ) {
+        // aleady closed.
+        return;
+    }
+
+    if( -1 == ::close(sp_) ) {
+        // executed once.
+        TRE_("error on close. errno=%d\n", errno);
+        return;
+    }
+
+    // close completed.
+    sp_ = -1;
 }

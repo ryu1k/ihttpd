@@ -15,6 +15,7 @@ class IHTTPD::Test::DaemonTest : public ::testing::Test
 public:
     static void constrcutor();
     static void run_stop();
+    static void close_();
 };
 
 TEST(DaemonTest, constrcutor) {
@@ -81,4 +82,28 @@ void DaemonTest::run_stop()
     ASSERT_EQ(false, daemon.running_); // must not be running
 
     ASSERT_EQ(0, pthread_join(th, NULL));
+}
+TEST(DaemonTest, close_) {
+    DaemonTest::close_();
+}
+void DaemonTest::close_()
+{
+        Daemon daemon("127.0.0.1", 56789);
+
+        // must be invalid first.
+        ASSERT_EQ(-1, daemon.sp_);
+
+        // assign.
+        daemon.sp_ = socket(AF_INET, SOCK_STREAM, 0);
+
+        // some sockeet must be assigned.
+        ASSERT_NE(-1, daemon.sp_);
+
+        // socket closed and marked as invalid.
+        daemon.close_();
+        ASSERT_EQ(-1, daemon.sp_);
+
+        // must be able to close twice.
+        daemon.close_();
+        ASSERT_EQ(-1, daemon.sp_);
 }
