@@ -166,7 +166,7 @@ TEST(utils, MsecTimer) {
 
     // pause. now() return same value while pausing.
     timer.stop();
-    ASSERT_EQ(false, timer.is_stopped());
+    ASSERT_EQ(true, timer.is_stopped());
     sleepmsec(200);
     ASSERT_GT(250, static_cast<int>(timer.now()) );
 

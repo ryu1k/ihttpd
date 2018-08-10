@@ -21,5 +21,5 @@ int IHTTPD::sleepmsec(uint32_t msec)
 
 uint32_t IHTTPD::MsecTimer::now()
 {
-    return -1;
+    return static_cast<uint32_t>( elapsed().wall / (1000 * 1000) );
 }
