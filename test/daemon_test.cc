@@ -6,7 +6,7 @@
 #include "test_config.hpp"
 
 #include <pthread.h>
-
+#include <boost/asio.hpp>
 
 using namespace IHTTPD;
 using namespace IHTTPD::Test;

@@ -152,7 +152,7 @@ TEST(utils, sleepmsec_wait1100) {
 }
 #endif // of #ifdef TEST_WITH_WAIT
 
-#if 1 // def TEST_WITH_WAIT
+#ifdef TEST_WITH_WAIT
 TEST(utils, MsecTimer) {
 
     // start with measuring.
