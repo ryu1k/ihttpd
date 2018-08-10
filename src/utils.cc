@@ -1,5 +1,6 @@
 
-#include <ihttpd.hpp>
+#include "ihttpd.hpp"
+#include "utils.hpp"
 
 #include <time.h>
 
@@ -18,3 +19,7 @@ int IHTTPD::sleepmsec(uint32_t msec)
     return nanosleep(&ts, NULL);
 }
 
+uint32_t IHTTPD::MsecTimer::now()
+{
+    return static_cast<uint32_t>( elapsed().wall / (1000 * 1000) );
+}

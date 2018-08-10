@@ -9,7 +9,7 @@ GTEST_INCLUDES=-I. -I../include \
 
 GTEST_ALL_CXX=${GTEST_BASE_SRC}/build/googlemock/gtest/libgtest.a
 GTEST_MAIN=${GTEST_BASE_SRC}/build/googlemock/gtest/libgtest_main.a
-GTEST_LIBS=-lpthread
+GTEST_LIBS=-lpthread -lboost_timer
 
 GTEST_CFLAGS=-Wall ${GTEST_INCLUDES}
 GTEST_DRIVERS=${GTEST_ALL_CXX} ${GTEST_MAIN} ${GTEST_LIBS}
