@@ -1,6 +1,5 @@
 
-
-#include "gtest/gtest.h"
+#include <stdint.h>
 
 namespace IHTTPD {
     class Daemon; // Handle incoming connection and pass it to worker.
@@ -10,6 +9,8 @@ namespace IHTTPD {
     namespace Test {
         class DaemonTest;
     };
-};
 
+    // in utils.cc
+    int sleepmsec(uint32_t msec); // sleep mili-seconds.
+};
 

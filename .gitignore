@@ -2,6 +2,7 @@
 # specific items.
 test/googletest
 test/test-all
+src/ihttpd
 
 # GNU Global
 GPATH
