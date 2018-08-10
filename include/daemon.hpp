@@ -22,7 +22,8 @@ public:
 
 protected:
     bool listen_();
-    bool accept_one_();
+    bool accept_one();
+    void close_();
 
     int sp_;
     bool running_;
