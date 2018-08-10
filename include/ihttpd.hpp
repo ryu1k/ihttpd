@@ -14,6 +14,8 @@ namespace IHTTPD {
 
     // in utils.cc
     class MsecTimer;
+
+    void msec2timespec(uint32_t msec, struct timespec* ts);
     int sleepmsec(uint32_t msec); // sleep mili-seconds.
 };
 

@@ -4,8 +4,9 @@
 
 #include <time.h>
 
-static void msec2timespec(uint32_t msec, struct timespec& ts)
+void IHTTPD::msec2timespec(uint32_t msec, struct timespec* ts_)
 {
+    struct timespec& ts = *ts_;
     ts.tv_sec = msec / 1000;
     ts.tv_nsec = (msec - ts.tv_sec * 1000) * 1000 * 1000;
 }
@@ -14,7 +15,7 @@ static void msec2timespec(uint32_t msec, struct timespec& ts)
 int IHTTPD::sleepmsec(uint32_t msec)
 {
     struct timespec ts;
-    msec2timespec(msec, ts);
+    msec2timespec(msec, &ts);
 
     return nanosleep(&ts, NULL);
 }
