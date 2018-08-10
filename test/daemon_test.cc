@@ -179,22 +179,22 @@ TEST(DaemonTest, close_) {
 }
 void DaemonTest::close_()
 {
-        Daemon daemon("127.0.0.1", 56789);
+    Daemon daemon("127.0.0.1", 56789);
 
-        // must be invalid first.
-        ASSERT_EQ(-1, daemon.sp_);
+    // must be invalid first.
+    ASSERT_EQ(-1, daemon.sp_);
 
-        // assign.
-        daemon.sp_ = socket(AF_INET, SOCK_STREAM, 0);
+    // assign.
+    daemon.sp_ = socket(AF_INET, SOCK_STREAM, 0);
 
-        // some sockeet must be assigned.
-        ASSERT_NE(-1, daemon.sp_);
+    // some sockeet must be assigned.
+    ASSERT_NE(-1, daemon.sp_);
 
-        // socket closed and marked as invalid.
-        daemon.close_();
-        ASSERT_EQ(-1, daemon.sp_);
+    // socket closed and marked as invalid.
+    daemon.close_();
+    ASSERT_EQ(-1, daemon.sp_);
 
-        // must be able to close twice.
-        daemon.close_();
-        ASSERT_EQ(-1, daemon.sp_);
+    // must be able to close twice.
+    daemon.close_();
+    ASSERT_EQ(-1, daemon.sp_);
 }
