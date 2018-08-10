@@ -13,14 +13,14 @@ using namespace IHTTPD::Test;
 class IHTTPD::Test::DaemonTest : public ::testing::Test
 {
 public:
-    static void Constrcutor();
-    static void Run_Stop();
+    static void constrcutor();
+    static void run_stop();
 };
 
-TEST(DaemonTest, Constrcutor) {
-    DaemonTest::Constrcutor();
+TEST(DaemonTest, constrcutor) {
+    DaemonTest::constrcutor();
 }
-void DaemonTest::Constrcutor()
+void DaemonTest::constrcutor()
 {
     // constrcutor must keep configured value.
 
@@ -55,10 +55,10 @@ void* daemon_test_run_daemon(void* thread_arg)
 }
 
 
-TEST(DaemonTest, Run_Stop) {
-    DaemonTest::Run_Stop();
+TEST(DaemonTest, run_stop) {
+    DaemonTest::run_stop();
 }
-void DaemonTest::Run_Stop()
+void DaemonTest::run_stop()
 {
     // run and exit when stopped.
     const std::string host("test-host-name");
