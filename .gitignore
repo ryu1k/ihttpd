@@ -31,4 +31,9 @@
 *.out
 *.app
 
+# GNU Global
+GPATH
+GRTAGS
+GTAGS
+
 test/googletest
