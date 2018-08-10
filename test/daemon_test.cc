@@ -23,9 +23,13 @@ void DaemonTest::Constrcutor()
 
     // Is value set exactly ?
     IHTTPD::Daemon daemon1(host, port, tick);
-	ASSERT_EQ(host, daemon1.hostname_);
-	ASSERT_EQ(port, daemon1.port_);
-	ASSERT_EQ(tick, daemon1.tick_msec_);
+
+	ASSERT_EQ(-1,    daemon1.sp_);
+	ASSERT_EQ(false, daemon1.running_);
+
+	ASSERT_EQ(host,  daemon1.hostname_);
+	ASSERT_EQ(port,  daemon1.port_);
+	ASSERT_EQ(tick,  daemon1.tick_msec_);
 
     // Check defalut value.
     IHTTPD::Daemon daemon2(host, port);
