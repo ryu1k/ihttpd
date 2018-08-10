@@ -25,7 +25,7 @@ protected:
     bool accept_one_();
 
     int sp_;
-    int running_;
+    bool running_;
 
     const std::string hostname_;
     const ushort port_;
