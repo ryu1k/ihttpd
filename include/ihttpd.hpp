@@ -14,3 +14,7 @@ namespace IHTTPD {
     int sleepmsec(uint32_t msec); // sleep mili-seconds.
 };
 
+// global trace.
+
+// error
+#define TRE_(...) printf("E: " __VA_ARGS__)

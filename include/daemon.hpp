@@ -17,8 +17,8 @@ public:
     Daemon(const std::string& hostname, ushort port, int tick_msec=DEFAULT_TICK_MSEC);
     ~Daemon();
 
-    bool start(); // start run loop until stop.
-    void stop();  
+    bool run(); // keep running until stop() or error()
+    void stop();
 
 protected:
     bool listen_();
