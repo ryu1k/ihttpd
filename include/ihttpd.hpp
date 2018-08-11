@@ -13,6 +13,9 @@ namespace IHTTPD {
         class MsecTimerTest;
     };
 
+    // in ihttpd_main.cc
+    int ihttpd_main(int argc, const char** argv);
+
     // in utils.cc
     class MsecTimer;
 

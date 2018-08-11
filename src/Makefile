@@ -1,6 +1,6 @@
 
 
-CXXSRCS = ihttpd utils daemon
+CXXSRCS = ihttpd ihttpd_main utils daemon
 
 OBJS = ${CXXSRCS:%=%.o}
 
