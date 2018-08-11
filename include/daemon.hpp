@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "ihttpd.hpp"
 
 #include <sys/types.h>
@@ -9,14 +11,20 @@
 // Accept incoming connections and put it to worker.
 class IHTTPD::Daemon
 {
+public:
     enum { DEFAULT_TICK_MSEC=100 };
 
-public:
     Daemon(const std::string& hostname, ushort port, uint tick_msec=DEFAULT_TICK_MSEC);
     ~Daemon();
 
-    bool run(); // keep running until stop() or error()
+    // entry point. keep running until stop() or error
+    bool run();
+
+    // control API
     void stop();
+
+    // status query
+    bool is_running() const;
 
 protected:
     bool listen_();

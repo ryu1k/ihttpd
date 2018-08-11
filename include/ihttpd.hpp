@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include <stdio.h>
 #include <stdint.h>
 #include <time.h>
@@ -12,6 +14,10 @@ namespace IHTTPD {
         class DaemonTest;
         class MsecTimerTest;
     };
+
+    // in ihttpd_main.cc
+    int ihttpd_main(int argc, const char** argv);
+    IHTTPD::Daemon* get_the_daemon();
 
     // in utils.cc
     class MsecTimer;

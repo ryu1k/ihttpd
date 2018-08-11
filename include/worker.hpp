@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "ihttpd.hpp"
 
 #include <sys/types.h>

@@ -1,7 +1,10 @@
 
-#include<ihttpd.hpp>
+
+// entry point only. deletete all task to IHTTPD::ihttpd_main.
+
+#include "ihttpd.hpp"
 
 int main(int argc, const char** argv)
 {
-    return 0;
+    return IHTTPD::ihttpd_main(argc, argv);
 }

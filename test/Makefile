@@ -1,7 +1,7 @@
 
 
 # TARGETS = test_itself_test test_itself_b_test
-TARGETS = daemon_test utils_test
+TARGETS = daemon_test utils_test ihttpd_main_test
 
 GTEST_BASE_SRC=googletest
 GTEST_INCLUDES=-I. -I../include \
