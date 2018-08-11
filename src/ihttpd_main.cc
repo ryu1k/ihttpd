@@ -13,6 +13,11 @@ static bool unset_sighandlers();
 
 static IHTTPD::Daemon* theDaemon_ = NULL;
 
+IHTTPD::Daemon* IHTTPD::get_the_daemon()
+{
+    return theDaemon_;
+}
+
 int IHTTPD::ihttpd_main(int argc, const char** argv)
 {
     // assign daemon
@@ -26,7 +31,7 @@ int IHTTPD::ihttpd_main(int argc, const char** argv)
         }
         
         // run
-        TRI_("Daemon start now. ihttpd pid=%d\n", getpid());
+        TRI_("Daemon start now. ihttpd pid=%d. Send SIGHUP or press Ctrl-C to stop.\n", getpid());
         theDaemon_->run();
         
         // reset sighandlers.
@@ -50,7 +55,7 @@ using ihttpd_sigaction_proc_t = void (*)(int signum, siginfo_t* siginfo, void* p
 
 static void ihttpd_sigaction_proc(int signum, siginfo_t* siginfo, void* p)
 {
-    TRI_(" signal comes. signum=%d\n", signum);
+    TRI_(" signal comes. signum=%d. going to stop.\n", signum);
     if( theDaemon_ ) {
         theDaemon_->stop();
     } else {

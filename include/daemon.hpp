@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "ihttpd.hpp"
 
 #include <sys/types.h>
@@ -22,7 +24,7 @@ public:
     void stop();
 
     // status query
-    bool is_running();
+    bool is_running() const;
 
 protected:
     bool listen_();

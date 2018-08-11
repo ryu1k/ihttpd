@@ -52,7 +52,7 @@ void IHTTPD::Daemon::stop()
     running_ = false;
 }
 
-bool IHTTPD::Daemon::is_running()
+bool IHTTPD::Daemon::is_running() const
 {
     return running_;
 }
