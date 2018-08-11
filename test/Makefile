@@ -3,6 +3,8 @@
 # TARGETS = test_itself_test test_itself_b_test
 TARGETS = daemon_test utils_test ihttpd_main_test
 
+OBJS = ${TARGETS:%=%.o}
+
 GTEST_BASE_SRC=googletest
 GTEST_INCLUDES=-I. -I../include \
 	-I${GTEST_BASE_SRC}/googletest/include -I${GTEST_BASE_SRC}/googlemock/include
@@ -38,7 +40,7 @@ clean-googletest:
 	rm -fr googletest
 
 clean:
-	rm -f test-all ${TARGETS}
+	rm -f test-all ${TARGETS} ${OBJS}
 
 all-from-scratch:
 	${MAKE} clean
@@ -47,17 +49,9 @@ all-from-scratch:
 	${MAKE} test-all
 
 .PHONY: test-all
-test-all:
-	g++ -o test-all ${GTEST_CFLAGS} ${TARGETS_CXX} ${GTEST_DRIVERS}
+test-all: ${OBJS}
+	g++ -o test-all ${GTEST_CFLAGS} ${OBJS} ${GTEST_DRIVERS}
 	./test-all
 
-
-test-each:
-	for t in ${TARGETS}; do \
-	  ${MAKE} test-one T=$$t; \
-	done
-
-test-one:
-	g++ -o ${T} ${GTEST_CFLAGS} ${T}.cc ${GTEST_DRIVERS}
-	./${T}
-
+%.o: %.cc
+	g++ ${GTEST_CFLAGS} ${CXXFLAGS} -c -o $@ $<
