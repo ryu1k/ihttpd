@@ -5,6 +5,8 @@ To learn low level programing, use of boost or other high level libraries is min
 
 # Architecture
 
+Consist of three classes, Daemon, Task and Worker.
+
 * Daemon
   * Listen a socket and accept.
   * Stop on signal or error.
@@ -21,6 +23,8 @@ To learn low level programing, use of boost or other high level libraries is min
   * Threading worker.
   * Wait a "Task" from the Daemon.
   * Receive a "Task" and process it.
+
+* -- connection -->  "Daemon" -- generate --> "Task" <-- Wait and proces -- "Worker"
 
 # Limitatinos
 
