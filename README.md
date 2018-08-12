@@ -1,2 +1,4 @@
-# wip2
-Instant HTTP server to study of C/C++, multi threading and BSD socket.
+# Instant HTTP Daemon (ihttpd)
+Instant HTTP server to study C/C++, multi threading by pthread and BSD socket.
+To learn low level programing, use of boost or other high level libraries is minimum.
+
