@@ -49,7 +49,9 @@ all-from-scratch:
 	${MAKE} test-all
 
 .PHONY: test-all
-test-all: ${OBJS}
+test-all: clean test
+
+test: ${OBJS}
 	g++ -o test-all ${GTEST_CFLAGS} ${OBJS} ${GTEST_DRIVERS}
 	./test-all
 

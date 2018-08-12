@@ -32,16 +32,8 @@ static auto wait_daemon_ticks = [](int times) {
 ////////////////////////////////////////////////////////////////////////
 // Tests
 
-static void* ihttpd_main_daemon_test_run_daemon(void* thread_arg)
-{
-    // pthread entry.
-
-    IHTTPD::ihttpd_main(0, NULL);
-
-    pthread_exit(NULL);
-    return NULL;
-}
-
+//  Is ignore target signal ignroed
+static void* ihttpd_main_daemon_test_run_daemon(void* thread_arg);
 TEST(ihttpd_main, signal_ignored) {
     // run and exit when stopped.
     const std::string host("127.0.0.1");
@@ -66,7 +58,8 @@ TEST(ihttpd_main, signal_ignored) {
     ASSERT_EQ(0, pthread_join(th, NULL));
 }
 
-
+//  Is accept target signal will cause stop of daemon or not.
+static void* ihttpd_main_daemon_test_run_daemon(void* thread_arg);
 TEST(ihttpd_main, signal_terminate) {
     // run and exit when stopped.
     const std::string host("127.0.0.1");
@@ -92,6 +85,17 @@ TEST(ihttpd_main, signal_terminate) {
         ASSERT_EQ(0, pthread_join(th, NULL));
     }
 }
+
+static void* ihttpd_main_daemon_test_run_daemon(void* thread_arg)
+{
+    // pthread entry.
+
+    IHTTPD::ihttpd_main(0, NULL);
+
+    pthread_exit(NULL);
+    return NULL;
+}
+
 #endif // of #ifdef TEST_WITH_WAIT
 
 

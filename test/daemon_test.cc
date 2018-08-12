@@ -22,6 +22,8 @@ public:
     static void close_();
 };
 
+
+// test of daemon parameter, parameter is applied correctly or not.
 TEST(DaemonTest, constrcutor) {
     DaemonTest::constrcutor();
 }
@@ -51,18 +53,12 @@ void DaemonTest::constrcutor()
 }
 
 #ifdef TEST_WITH_WAIT
-static void* daemon_test_run_daemon(void* thread_arg)
-{
-    Daemon& daemon = *reinterpret_cast<Daemon*>(thread_arg);
-    daemon.run();
-
-    pthread_exit( NULL );
-    return NULL;
-}
-
+// Test of run -> stop of daemon.
+// Do not check the functionalities, such as listen accept and so on.
 TEST(DaemonTest, run_stop) {
     DaemonTest::run_stop();
 }
+static void* daemon_test_run_daemon(void* thread_arg);
 void DaemonTest::run_stop()
 {
     // run and exit when stopped.
@@ -86,12 +82,24 @@ void DaemonTest::run_stop()
 
     ASSERT_EQ(0, pthread_join(th, NULL));
 }
+static void* daemon_test_run_daemon(void* thread_arg)
+{
+    Daemon& daemon = *reinterpret_cast<Daemon*>(thread_arg);
+    daemon.run();
+
+    pthread_exit( NULL );
+    return NULL;
+}
 #endif // of #ifdef TEST_WITH_WAIT
 
+// Test of listen.
+//  - Can open socket with valid arguments.
+//  - Fails with invalid arguments
+//  - Fails on duplicated opening.
+//  - Success when previous instance have closed.
 
 // #undef TRL_
 // #define TRL_(...) do { fprintf(stderr, "L: %s:%d: ", __func__, __LINE__); fprintf(stderr, __VA_ARGS__); } while(0)
-
 TEST(DaemonTest, listen_) {
     DaemonTest::listen_();
 }
@@ -173,30 +181,15 @@ void DaemonTest::listen_()
 #undef TRL_
 #define TRL_(...)
 
+
+// Test of accept.
+//   - Test just accepting a socket.
+//   - Do not test validity of accepted socket.
 #ifdef TEST_WITH_WAIT
-static void* DaemonTest_accpet_accessor(void* arg_)
-{
-    // connect must be successful.
-    namespace asio = boost::asio;
-    asio::io_service io_service;
-    asio::ip::tcp::socket socket(io_service);
-    boost::system::error_code error;
-
-    socket.connect(asio::ip::tcp::endpoint( asio::ip::address::from_string("127.0.0.1"), 56789),
-                   error);
-    sleepmsec(100);
-
-    uint64_t is_ok = ! error;
-    TRI_(" connect is_ok=%lu\n", is_ok);
-
-    pthread_exit( reinterpret_cast<void*>(is_ok) );
-    return NULL;
-}
-
-
 TEST(DaemonTest, accept_) {
     DaemonTest::accept_();
 }
+static void* DaemonTest_accpet_accessor(void* arg_);
 void DaemonTest::accept_()
 {
     Daemon daemon("127.0.0.1", 56789);
@@ -227,17 +220,35 @@ void DaemonTest::accept_()
     ASSERT_EQ(0, pthread_join(th, &retval));
     ASSERT_EQ(1, static_cast<int>(reinterpret_cast<uint64_t>(retval)));
 }
+static void* DaemonTest_accpet_accessor(void* arg_)
+{
+    // connect must be successful.
+    namespace asio = boost::asio;
+    asio::io_service io_service;
+    asio::ip::tcp::socket socket(io_service);
+    boost::system::error_code error;
+
+    socket.connect(asio::ip::tcp::endpoint( asio::ip::address::from_string("127.0.0.1"), 56789),
+                   error);
+    sleepmsec(100);
+
+    uint64_t is_ok = ! error;
+    TRI_(" connect is_ok=%lu\n", is_ok);
+
+    pthread_exit( reinterpret_cast<void*>(is_ok) );
+    return NULL;
+}
 #endif // of #ifdef TEST_WITH_WAIT
 
 
-#ifdef TEST_WITH_WAIT
-// Note:
-//   accept_ do poll() -> accept() flow.
+//   Test of race condition between poll() and accept().
+//
+//   daemon.accept_() will do poll() -> accept() flow.
 //   But accept() may block because incoming socket is closed between
 //   poll() and accept().
 //   In this case, there is no incoming connection and accpept() will block.
 //   To avoid blocking, we make sure that listening socket is nonblock.
-
+#ifdef TEST_WITH_WAIT
 TEST(DaemonTest, accept_nonblock) {
     DaemonTest::accept_nonblock();
 }
@@ -275,7 +286,11 @@ static void* accept_nonblock_sp_closer(void* arg)
 }
 #endif // of #ifdef TEST_WITH_WAIT
 
-
+// Test of close_()
+//   - This test confirm followings
+//     - Can close
+//     - sp_ is closed.
+//     - sp_ is -1 (INVALID)
 TEST(DaemonTest, close_) {
     DaemonTest::close_();
 }
