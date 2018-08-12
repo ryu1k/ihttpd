@@ -201,5 +201,7 @@ bool IHTTPD::Daemon::accept_one()
 bool IHTTPD::Daemon::process_one(int newsp)
 {
     TRI_("accepted sp=%d\n", newsp);
+    ::close(newsp); // stub to prevent resource leak.
+
     return true;
 }
