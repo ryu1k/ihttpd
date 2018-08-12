@@ -18,6 +18,7 @@ public:
     static void run_stop();
     static void listen_();
     static void accept_();
+    static void accept_nonblock();
     static void close_();
 };
 
@@ -55,6 +56,7 @@ static void* daemon_test_run_daemon(void* thread_arg)
     Daemon& daemon = *reinterpret_cast<Daemon*>(thread_arg);
     daemon.run();
 
+    pthread_exit( NULL );
     return NULL;
 }
 
@@ -226,6 +228,51 @@ void DaemonTest::accept_()
     void* retval = NULL;
     ASSERT_EQ(0, pthread_join(th, &retval));
     ASSERT_EQ(1, static_cast<int>(reinterpret_cast<uint64_t>(retval)));
+}
+#endif // of #ifdef TEST_WITH_WAIT
+
+
+#if 1 //def TEST_WITH_WAIT
+// Note:
+//   accept_ do poll() -> accept() flow.
+//   But accept() may block because incoming socket is closed between
+//   poll() and accept().
+//   In this case, there is no incoming connection and accpept() will block.
+//   To avoid blocking, we make sure that listening socket is nonblock.
+
+TEST(DaemonTest, accept_nonblock) {
+    DaemonTest::accept_nonblock();
+}
+static void* accept_nonblock_sp_closer(void* arg);
+void DaemonTest::accept_nonblock()
+{
+    Daemon daemon("127.0.0.1", 56789);
+    ASSERT_TRUE( daemon.listen_() );
+
+    // close daemon socket at 1 second later to avoid blocking whole test.
+    pthread_t th;
+    ASSERT_EQ(0, pthread_create(&th, NULL, accept_nonblock_sp_closer, &daemon.sp_));
+
+    // no connection.
+    MsecTimer timer;
+    // this would block if socket is blocking.
+    ::accept(daemon.sp_, NULL, NULL);
+
+    // if socket is nonblocking, accept will return without wait.
+    ASSERT_GT(static_cast<uint>(50), timer.now());
+
+    ASSERT_EQ(0, pthread_join(th, NULL));
+}
+
+static void* accept_nonblock_sp_closer(void* arg)
+{
+    int sp_ = *reinterpret_cast<int*>(arg);
+
+    sleepmsec(1000);
+    close(sp_);
+
+    pthread_exit( NULL );
+    return NULL;
 }
 #endif // of #ifdef TEST_WITH_WAIT
 
