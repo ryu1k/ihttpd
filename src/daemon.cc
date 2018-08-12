@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <poll.h>
+#include <fcntl.h>
 
 #include <boost/format.hpp>
 
@@ -58,6 +59,23 @@ bool IHTTPD::Daemon::is_running() const
 }
 
 
+static bool make_socket_nonblocking_(int sp)
+{
+    int flags = fcntl(sp, F_GETFL);
+
+    if (flags == -1) {
+        TRE_("failed to get sp flags. sp=%d, errno=%d\n", sp, errno);
+        return false;
+    }
+
+    if( -1 == fcntl(sp, F_SETFL, flags | O_NONBLOCK) ) {
+        TRE_("failed to set sp flags. sp=%d, errno=%d\n", sp, errno);
+        return false;
+    }
+
+    return true;
+}
+
 bool IHTTPD::Daemon::listen_()
 {
     TRL_("going to listen. (%s, %d)\n", hostname_.c_str(), port_);
@@ -98,6 +116,12 @@ bool IHTTPD::Daemon::listen_()
     if ( rp == NULL) {               /* No address succeeded */
         // run OK once.
         TRE_("can not bind to any addr. (%s, %d)\n", hostname_.c_str(), port_);
+        return false;
+    }
+
+    // set nonblocking
+    if( ! make_socket_nonblocking_(sp_)) {
+        TRE_("failed to make the listening soket nonblocking.\n");
         return false;
     }
 
@@ -147,6 +171,13 @@ bool IHTTPD::Daemon::accept_one()
     int newsp = ::accept(sp_, NULL, NULL);
     if( -1 !=  newsp) {
         // We got a good sp.
+
+        // set nonblocking
+        if( ! make_socket_nonblocking_(newsp)) {
+            TRE_("failed to make the listening soket nonblocking.\n");
+            return false;
+        }
+
         if( process_one(newsp) ) {
             return true;
         } else {

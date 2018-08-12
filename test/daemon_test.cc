@@ -97,8 +97,6 @@ TEST(DaemonTest, listen_) {
 }
 void DaemonTest::listen_()
 {
-    // ASSERT_FALSE(true) << "!!! set nonblock !!!";
-
     {
         TRL_("good argument.\n");
         Daemon daemon("127.0.0.1", 56789);
@@ -232,7 +230,7 @@ void DaemonTest::accept_()
 #endif // of #ifdef TEST_WITH_WAIT
 
 
-#if 1 //def TEST_WITH_WAIT
+#ifdef TEST_WITH_WAIT
 // Note:
 //   accept_ do poll() -> accept() flow.
 //   But accept() may block because incoming socket is closed between
@@ -260,6 +258,7 @@ void DaemonTest::accept_nonblock()
 
     // if socket is nonblocking, accept will return without wait.
     ASSERT_GT(static_cast<uint>(50), timer.now());
+    TRI_("accept returns in %u msec.\n", timer.now());
 
     ASSERT_EQ(0, pthread_join(th, NULL));
 }
