@@ -45,12 +45,12 @@ static int sleepmsec_shared = 0;
 void* sleepmsec_update_shared(void* thread_arg)
 {
     uint64_t wait64 = reinterpret_cast<uint64_t>( thread_arg );
-    uint32_t wait = static_cast<uint32_t>( wait64 );
+    uint32_t waitms = static_cast<uint32_t>( wait64 );
 
-    TL_(" %s : wait %d msec : start\n", __func__, wait );
-    sleepmsec( wait );
-    sleepmsec_shared = wait;
-    TL_(" %s : wait %d msec : done\n", __func__, wait);
+    TL_(" %s : wait %d msec : start\n", __func__, waitms );
+    sleepmsec( waitms );
+    sleepmsec_shared = waitms;
+    TL_(" %s : wait %d msec : done\n", __func__, waitms);
 
     return NULL;
 }

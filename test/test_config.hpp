@@ -1,7 +1,18 @@
 
+
+#ifndef TEST_CONFIG_HPP_INCL_
+#define TEST_CONFIG_HPP_INCL_
+
+#include "ihttpd.hpp"
+#include "daemon.hpp"
+
+
+////////////////////////////////////////////////////////////////////////
+// Test conditions.
+
 // Test with sleep or wait.
 // These test may take long.
-// #define TEST_WITH_WAIT
+#define TEST_WITH_WAIT
 
 
 // Show trace output from test thread.
@@ -22,3 +33,5 @@
 // after trace, use following to disable again.
 #undef TRL_
 #define TRL_(...)
+
+#endif // of TEST_CONFIG_HPP_INCL_
