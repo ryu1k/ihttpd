@@ -54,7 +54,7 @@ void DaemonTest::constrcutor()
 }
 
 
-#ifdef TEST_WITH_WAIT
+#if 1 //def TEST_WITH_WAIT
 // Test of run -> stop of daemon.
 // Do not check the functionalities, such as listen accept and so on.
 TEST(DaemonTest, run_stop) {
@@ -126,6 +126,11 @@ void DaemonTest::run()
     socket2.connect(asio::ip::tcp::endpoint( asio::ip::address::from_string("127.0.0.1"), 56789),
                    error);
     ASSERT_EQ(true, ! error);
+
+    // wait enough
+    // This must not take full tick.
+    sleepmsec(static_cast<int>(daemon.tick_msec_ * 0.5)); 
+    ASSERT_EQ(static_cast<uint32_t>(2), daemon.process_count_);
 
     daemon.stop();
     sleepmsec(daemon.tick_msec_ * 2);  // wait enough

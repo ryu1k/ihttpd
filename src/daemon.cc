@@ -24,7 +24,8 @@
 
 IHTTPD::Daemon::Daemon(const std::string& hostname, ushort port, uint tick_msec/*=100*/)
     : sp_(-1), running_(false),
-      hostname_(hostname), port_(port), tick_msec_(tick_msec)
+      hostname_(hostname), port_(port), tick_msec_(tick_msec),
+      process_count_(0)
 {
     
 }
@@ -36,11 +37,14 @@ IHTTPD::Daemon::~Daemon()
 
 bool IHTTPD::Daemon::run()
 {
-    running_ = true;
+    if( !listen_() ) {
+        TRE_("Listen failed.\n");
+        return false;
+    }
 
+    running_ = true;
     while( running_ ) {
-        // TRL_("working...\n");
-        sleepmsec( tick_msec_);
+        accept_one();
     }
  
     close_();
@@ -200,7 +204,7 @@ bool IHTTPD::Daemon::accept_one()
 // @retval : true: no error, false: error. must exit.
 bool IHTTPD::Daemon::process_one(int newsp)
 {
-    TRI_("accepted sp=%d\n", newsp);
+    TRI_("accepted sp=%d. sp comes %d times.\n", newsp, ++process_count_);
     ::close(newsp); // stub to prevent resource leak.
 
     return true;
