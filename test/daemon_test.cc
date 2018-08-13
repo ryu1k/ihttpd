@@ -17,6 +17,7 @@ public:
     static void constrcutor();
     static void run_stop();
     static void run();
+    static void run_listen_fails();
     static void listen_();
     static void accept_();
     static void accept_nonblock();
@@ -129,7 +130,7 @@ void DaemonTest::run()
 
     // wait enough
     // This must not take full tick.
-    sleepmsec(static_cast<int>(daemon.tick_msec_ * 0.5)); 
+    sleepmsec(static_cast<int>(daemon.tick_msec_ * 0.5));
     ASSERT_EQ(static_cast<uint32_t>(2), daemon.process_count_);
 
     daemon.stop();
@@ -137,6 +138,34 @@ void DaemonTest::run()
     ASSERT_EQ(false, daemon.running_); // must not be running
 
     ASSERT_EQ(0, pthread_join(th, NULL));
+}
+
+
+// Test of listen fail in daemon.run()
+//   After call of run(), daemon will listen.
+//   This test is the case of listen failes.
+TEST(DaemonTest, run_listen_fails) {
+    DaemonTest::run_listen_fails();
+}
+static void* daemon_test_run_daemon(void* thread_arg);
+void DaemonTest::run_listen_fails()
+{
+    // run and exit when stopped.
+    const std::string host("8.8.8.8"); // bad host.
+    const ushort port = 56789;
+
+    Daemon daemon(host, port);
+    ASSERT_EQ(false, daemon.running_);
+
+    // Run will be called in the thread but will fail to listen then exit soon.
+    pthread_t th;
+    ASSERT_EQ(0, pthread_create(&th, NULL, daemon_test_run_daemon, &daemon) );
+
+    // wait startup
+    sleepmsec(daemon.tick_msec_ * 2);
+    ASSERT_EQ(false, daemon.running_);
+
+    ASSERT_EQ(0, pthread_join(th, NULL));    
 }
 
 
@@ -148,7 +177,9 @@ static void* daemon_test_run_daemon(void* thread_arg)
     pthread_exit( NULL );
     return NULL;
 }
+
 #endif // of #ifdef TEST_WITH_WAIT
+
 
 // Test of listen.
 //  - Can open socket with valid arguments.
