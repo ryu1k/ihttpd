@@ -18,6 +18,7 @@ public:
     static void run_stop();
     static void run();
     static void run_listen_fails();
+    static void run_socket_broken();
     static void listen_();
     static void accept_();
     static void accept_nonblock();
@@ -166,6 +167,41 @@ void DaemonTest::run_listen_fails()
     ASSERT_EQ(false, daemon.running_);
 
     ASSERT_EQ(0, pthread_join(th, NULL));    
+}
+
+
+// Test of listen fail in daemon.run()
+//   After call of run(), daemon will listen.
+//   This test is the case of listen failes.
+TEST(DaemonTest, run_socket_broken) {
+    DaemonTest::run_socket_broken();
+}
+static void* daemon_test_run_daemon(void* thread_arg);
+void DaemonTest::run_socket_broken()
+{
+    // run and exit when stopped.
+    const std::string host("127.0.0.1"); // bad host.
+    const ushort port = 56789;
+
+    Daemon daemon(host, port);
+    ASSERT_EQ(false, daemon.running_);
+
+    // Run will be called in the thread but will fail to listen then exit soon.
+    pthread_t th;
+    ASSERT_EQ(0, pthread_create(&th, NULL, daemon_test_run_daemon, &daemon) );
+
+    // wait startup
+    sleepmsec(daemon.tick_msec_);
+    ASSERT_EQ(true, daemon.running_);
+
+    // forcibly close socket.
+    ::close(daemon.sp_);
+
+    // must exit run()
+    sleepmsec(daemon.tick_msec_);
+    ASSERT_EQ(false, daemon.running_);
+
+    ASSERT_EQ(0, pthread_join(th, NULL));
 }
 
 
