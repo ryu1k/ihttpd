@@ -40,5 +40,7 @@ protected:
     const ushort port_;
     const uint tick_msec_;
 
+    uint32_t process_count_; // for test. may wrap-around.
+
     friend IHTTPD::Test::DaemonTest;
 };
