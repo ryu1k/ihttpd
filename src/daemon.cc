@@ -44,9 +44,12 @@ bool IHTTPD::Daemon::run()
 
     running_ = true;
     while( running_ ) {
-        accept_one();
+        if( ! accept_one() ) {
+            TRE_("Something NG in accept_one(). exit\n");
+            break;
+        }
     }
- 
+    running_ = false;
     close_();
 
     return true;
