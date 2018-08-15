@@ -37,6 +37,12 @@ IHTTPD::Daemon::~Daemon()
 
 bool IHTTPD::Daemon::run()
 {
+    if( -1 != sp_ || running_) {
+        TRE_("socket aleady assigned or aleady running. sp=%d, running=%s\n",
+             sp_, running_ ? "true" : "false");
+        return false;
+    }
+
     if( !listen_() ) {
         TRE_("Listen failed.\n");
         return false;
@@ -83,6 +89,18 @@ static bool make_socket_nonblocking_(int sp)
     return true;
 }
 
+
+static bool make_socket_reusable(int sp)
+{
+    int opt = 1;
+    if( -1 == setsockopt(sp, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) ) {
+        TRE_("failed to make sp reusable. sp=%d, errno=%d\n", sp, errno);
+        return false;
+    }
+
+    return true;
+}
+
 bool IHTTPD::Daemon::listen_()
 {
     TRL_("going to listen. (%s, %d)\n", hostname_.c_str(), port_);
@@ -108,6 +126,11 @@ bool IHTTPD::Daemon::listen_()
                      rp->ai_protocol);
         if (sp_ == -1) {
             continue;
+        }
+
+        // make socket reusable
+        if( ! make_socket_reusable(sp_)) {
+            return false;
         }
 
         if (bind(sp_, rp->ai_addr, rp->ai_addrlen) == 0) {
@@ -181,7 +204,7 @@ bool IHTTPD::Daemon::accept_one()
 
         // set nonblocking
         if( ! make_socket_nonblocking_(newsp)) {
-            TRE_("failed to make the listening soket nonblocking.\n");
+            TRE_("failed to make the new soket nonblocking.\n");
             return false;
         }
 

@@ -12,12 +12,15 @@ static bool set_sighandlers();
 static bool unset_sighandlers();
 
 static IHTTPD::Daemon* theDaemon_ = NULL;
-
+// for test.
 IHTTPD::Daemon* IHTTPD::get_the_daemon()
 {
     return theDaemon_;
 }
 
+
+// - assign & release daemon instance 
+// - set & unset signal handlers
 int IHTTPD::ihttpd_main(int argc, const char** argv)
 {
     // assign daemon
