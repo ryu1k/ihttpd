@@ -51,9 +51,17 @@ all-from-scratch:
 .PHONY: test-all
 test-all: clean test
 
-test: ${OBJS}
-	g++ -o test-all ${GTEST_CFLAGS} ${OBJS} ${GTEST_DRIVERS}
+test: build
 	./test-all
+
+
+valgrind-all: clean valgrind
+
+valgrind: build
+	valgrind ${VGOPTS} ./test-all
+
+build:  ${OBJS}
+	g++ -o test-all ${GTEST_CFLAGS} ${OBJS} ${GTEST_DRIVERS}
 
 %.o: %.cc
 	g++ ${GTEST_CFLAGS} ${CXXFLAGS} -c -o $@ $<
