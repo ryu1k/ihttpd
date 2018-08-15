@@ -303,7 +303,7 @@ void DaemonTest::listen_()
         ASSERT_EQ(-1, daemon2.sp_);
 
         daemon.stop(); // closed by stop.
-        sleepmsec(daemon.tick_msec_ * 3); // wait complete of stop.
+        ASSERT_EQ(0, pthread_join(th, NULL));
         ASSERT_EQ(-1, daemon.sp_); // must be closed.
 
         Daemon daemon3(OK_ADDR, TARGET_PORT);
