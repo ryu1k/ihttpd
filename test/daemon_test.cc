@@ -11,6 +11,16 @@
 using namespace IHTTPD;
 using namespace IHTTPD::Test;
 
+////////////////////////////////////////////////////////////////////////
+// test resources
+namespace IHTTPD {
+    namespace Test {
+        static const char* OK_ADDR = "127.0.0.1";
+        static const char* NG_ADDR = "8.8.8.8";
+        static const short TARGET_PORT = 56793;
+    };
+};
+
 class IHTTPD::Test::DaemonTest : public ::testing::Test
 {
 public:
@@ -35,7 +45,7 @@ void DaemonTest::constrcutor()
     // constrcutor must keep configured value.
 
     const std::string host("test-host-name");
-    const ushort port = 56789;
+    const ushort port = TARGET_PORT;
     uint tick = 50;
 
     // Is value set exactly ?
@@ -56,7 +66,7 @@ void DaemonTest::constrcutor()
 }
 
 
-#if 1 //def TEST_WITH_WAIT
+#ifdef TEST_WITH_WAIT
 // Test of run -> stop of daemon.
 // Do not check the functionalities, such as listen accept and so on.
 TEST(DaemonTest, run_stop) {
@@ -66,8 +76,8 @@ static void* daemon_test_run_daemon(void* thread_arg);
 void DaemonTest::run_stop()
 {
     // run and exit when stopped.
-    const std::string host("127.0.0.1");
-    const ushort port = 56789;
+    const std::string host(OK_ADDR);
+    const ushort port = TARGET_PORT;
 
     Daemon daemon(host, port);
 
@@ -98,8 +108,8 @@ static void* daemon_test_run_daemon(void* thread_arg);
 void DaemonTest::run()
 {
     // run and exit when stopped.
-    const std::string host("127.0.0.1");
-    const ushort port = 56789;
+    const std::string host(OK_ADDR);
+    const ushort port = TARGET_PORT;
 
     Daemon daemon(host, port);
     ASSERT_EQ(false, daemon.running_);
@@ -120,12 +130,12 @@ void DaemonTest::run()
     asio::ip::tcp::socket socket(io_service);
     boost::system::error_code error;
 
-    socket.connect(asio::ip::tcp::endpoint( asio::ip::address::from_string("127.0.0.1"), 56789),
+    socket.connect(asio::ip::tcp::endpoint( asio::ip::address::from_string(OK_ADDR), TARGET_PORT),
                    error);
     ASSERT_EQ(true, ! error);
 
     asio::ip::tcp::socket socket2(io_service);
-    socket2.connect(asio::ip::tcp::endpoint( asio::ip::address::from_string("127.0.0.1"), 56789),
+    socket2.connect(asio::ip::tcp::endpoint( asio::ip::address::from_string(OK_ADDR), TARGET_PORT),
                    error);
     ASSERT_EQ(true, ! error);
 
@@ -152,8 +162,8 @@ static void* daemon_test_run_daemon(void* thread_arg);
 void DaemonTest::run_listen_fails()
 {
     // run and exit when stopped.
-    const std::string host("8.8.8.8"); // bad host.
-    const ushort port = 56789;
+    const std::string host(NG_ADDR); // bad host.
+    const ushort port = TARGET_PORT;
 
     Daemon daemon(host, port);
     ASSERT_EQ(false, daemon.running_);
@@ -180,8 +190,8 @@ static void* daemon_test_run_daemon(void* thread_arg);
 void DaemonTest::run_socket_broken()
 {
     // run and exit when stopped.
-    const std::string host("127.0.0.1"); // bad host.
-    const ushort port = 56789;
+    const std::string host(OK_ADDR); // bad host.
+    const ushort port = TARGET_PORT;
 
     Daemon daemon(host, port);
     ASSERT_EQ(false, daemon.running_);
@@ -232,7 +242,7 @@ void DaemonTest::listen_()
 {
     {
         TRL_("good argument.\n");
-        Daemon daemon("127.0.0.1", 56789);
+        Daemon daemon(OK_ADDR, TARGET_PORT);
         ASSERT_EQ(-1, daemon.sp_);
         ASSERT_EQ(true, daemon.listen_());
         ASSERT_NE(-1, daemon.sp_);
@@ -240,7 +250,7 @@ void DaemonTest::listen_()
 
     {
         TRL_("good argument. previous resource must be closed.\n");
-        Daemon daemon("127.0.0.1", 56789);
+        Daemon daemon(OK_ADDR, TARGET_PORT);
         ASSERT_EQ(-1, daemon.sp_);
         ASSERT_EQ(true, daemon.listen_());
         ASSERT_NE(-1, daemon.sp_);
@@ -256,7 +266,7 @@ void DaemonTest::listen_()
 
     {
         TRL_("invalid addr.\n");
-        Daemon daemon("8.8.8.8", 0); // must fail.
+        Daemon daemon(NG_ADDR, 0); // must fail.
         ASSERT_EQ(-1, daemon.sp_);
         ASSERT_EQ(false, daemon.listen_());
         ASSERT_EQ(-1, daemon.sp_);
@@ -264,12 +274,12 @@ void DaemonTest::listen_()
 
     {
         TRL_("check opening of the por indirectly by opening the port twice.\n");
-        Daemon daemon("127.0.0.1", 56789);
+        Daemon daemon(OK_ADDR, TARGET_PORT);
         ASSERT_EQ(-1, daemon.sp_);
         ASSERT_EQ(true, daemon.listen_());
         ASSERT_NE(-1, daemon.sp_);
 
-        Daemon daemon2("127.0.0.1", 56789);
+        Daemon daemon2(OK_ADDR, TARGET_PORT);
         ASSERT_EQ(-1, daemon2.sp_);
         ASSERT_EQ(false, daemon2.listen_()); // must fail
         ASSERT_EQ(-1, daemon2.sp_);
@@ -278,7 +288,7 @@ void DaemonTest::listen_()
 #ifdef TEST_WITH_WAIT
     {
         TRL_("port closed after stop.\n");
-        Daemon daemon("127.0.0.1", 56789);
+        Daemon daemon(OK_ADDR, TARGET_PORT);
         ASSERT_EQ(-1, daemon.sp_);
         ASSERT_EQ(true, daemon.listen_());
         ASSERT_NE(-1, daemon.sp_);
@@ -287,7 +297,7 @@ void DaemonTest::listen_()
         ASSERT_EQ(0, pthread_create(&th, NULL, daemon_test_run_daemon, &daemon) );
         sleepmsec(daemon.tick_msec_); // wait startup
 
-        Daemon daemon2("127.0.0.1", 56789);
+        Daemon daemon2(OK_ADDR, TARGET_PORT);
         ASSERT_EQ(-1, daemon2.sp_);
         ASSERT_EQ(false, daemon2.listen_()); // fail to re-open.
         ASSERT_EQ(-1, daemon2.sp_);
@@ -296,7 +306,7 @@ void DaemonTest::listen_()
         sleepmsec(daemon.tick_msec_ * 3); // wait complete of stop.
         ASSERT_EQ(-1, daemon.sp_); // must be closed.
 
-        Daemon daemon3("127.0.0.1", 56789);
+        Daemon daemon3(OK_ADDR, TARGET_PORT);
         ASSERT_EQ(-1, daemon3.sp_);
         ASSERT_EQ(true, daemon3.listen_()); // must be able to re-open.
         ASSERT_NE(-1, daemon3.sp_);
@@ -317,7 +327,7 @@ TEST(DaemonTest, accept_) {
 static void* DaemonTest_accpet_accessor(void* arg_);
 void DaemonTest::accept_()
 {
-    Daemon daemon("127.0.0.1", 56789);
+    Daemon daemon(OK_ADDR, TARGET_PORT);
     ASSERT_TRUE( daemon.listen_() );
 
     // no connection.
@@ -353,7 +363,7 @@ static void* DaemonTest_accpet_accessor(void* arg_)
     asio::ip::tcp::socket socket(io_service);
     boost::system::error_code error;
 
-    socket.connect(asio::ip::tcp::endpoint( asio::ip::address::from_string("127.0.0.1"), 56789),
+    socket.connect(asio::ip::tcp::endpoint( asio::ip::address::from_string(OK_ADDR), TARGET_PORT),
                    error);
     sleepmsec(100);
 
@@ -380,7 +390,7 @@ TEST(DaemonTest, accept_nonblock) {
 static void* accept_nonblock_sp_closer(void* arg);
 void DaemonTest::accept_nonblock()
 {
-    Daemon daemon("127.0.0.1", 56789);
+    Daemon daemon(OK_ADDR, TARGET_PORT);
     ASSERT_TRUE( daemon.listen_() );
 
     // close daemon socket at 1 second later to avoid blocking whole test.
@@ -421,7 +431,7 @@ TEST(DaemonTest, close_) {
 }
 void DaemonTest::close_()
 {
-    Daemon daemon("127.0.0.1", 56789);
+    Daemon daemon(OK_ADDR, TARGET_PORT);
 
     // must be invalid first.
     ASSERT_EQ(-1, daemon.sp_);
