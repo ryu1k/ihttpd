@@ -281,17 +281,15 @@ void DaemonTest::listen_()
 
         Daemon daemon2(OK_ADDR, TARGET_PORT);
         ASSERT_EQ(-1, daemon2.sp_);
-        ASSERT_EQ(false, daemon2.listen_()); // must fail
-        ASSERT_EQ(-1, daemon2.sp_);
+        ASSERT_EQ(true, daemon2.listen_()); // must fail
+        ASSERT_NE(-1, daemon2.sp_);
     }
 
 #ifdef TEST_WITH_WAIT
     {
         TRL_("port closed after stop.\n");
-        Daemon daemon(OK_ADDR, TARGET_PORT);
+        Daemon daemon(OK_ADDR, TARGET_PORT); // this daemon will be run by thread.
         ASSERT_EQ(-1, daemon.sp_);
-        ASSERT_EQ(true, daemon.listen_());
-        ASSERT_NE(-1, daemon.sp_);
 
         pthread_t th;
         ASSERT_EQ(0, pthread_create(&th, NULL, daemon_test_run_daemon, &daemon) );
@@ -299,8 +297,9 @@ void DaemonTest::listen_()
 
         Daemon daemon2(OK_ADDR, TARGET_PORT);
         ASSERT_EQ(-1, daemon2.sp_);
-        ASSERT_EQ(false, daemon2.listen_()); // fail to re-open.
-        ASSERT_EQ(-1, daemon2.sp_);
+        ASSERT_EQ(true, daemon2.listen_()); // can re-open.
+        ASSERT_NE(-1, daemon2.sp_);
+        daemon2.close_();
 
         daemon.stop(); // closed by stop.
         ASSERT_EQ(0, pthread_join(th, NULL));
