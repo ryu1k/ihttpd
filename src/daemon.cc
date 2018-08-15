@@ -37,6 +37,12 @@ IHTTPD::Daemon::~Daemon()
 
 bool IHTTPD::Daemon::run()
 {
+    if( -1 != sp_ || running_) {
+        TRE_("socket aleady assigned or aleady running. sp=%d, running=%s\n",
+             sp_, running_ ? "true" : "false");
+        return false;
+    }
+
     if( !listen_() ) {
         TRE_("Listen failed.\n");
         return false;
