@@ -190,7 +190,7 @@ static void* daemon_test_run_daemon(void* thread_arg);
 void DaemonTest::run_socket_broken()
 {
     // run and exit when stopped.
-    const std::string host(OK_ADDR); // bad host.
+    const std::string host(OK_ADDR);
     const ushort port = TARGET_PORT;
 
     Daemon daemon(host, port);
