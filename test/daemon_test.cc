@@ -283,6 +283,8 @@ void DaemonTest::listen_()
         ASSERT_EQ(-1, daemon2.sp_);
         ASSERT_EQ(true, daemon2.listen_()); // must fail
         ASSERT_NE(-1, daemon2.sp_);
+
+        // Daemon* daemon3 = new Daemon(OK_ADDR, TARGET_PORT);
     }
 
 #ifdef TEST_WITH_WAIT

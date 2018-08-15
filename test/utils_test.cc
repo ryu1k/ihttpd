@@ -40,7 +40,8 @@ TEST(utils, msec2timespec) {
 #define TL_(...)
 #endif
 
-#ifdef TEST_WITH_WAIT
+
+#if defined(TEST_WITH_WAIT) && defined(TEST_AFFECTED_BY_LOAD)
 static int sleepmsec_shared = 0;
 void* sleepmsec_update_shared(void* thread_arg)
 {
@@ -150,9 +151,9 @@ TEST(utils, sleepmsec_wait1100) {
     // tear down.
     ASSERT_EQ(0, pthread_join(th, NULL));
 }
-#endif // of #ifdef TEST_WITH_WAIT
+#endif // of #if defined(TEST_WITH_WAIT) && defined(TEST_AFFECTED_BY_LOAD)
 
-#ifdef TEST_WITH_WAIT
+#if defined(TEST_WITH_WAIT) && defined(TEST_AFFECTED_BY_LOAD)
 TEST(utils, MsecTimer) {
 
     // start with measuring.
@@ -185,7 +186,7 @@ TEST(utils, MsecTimer) {
     ASSERT_LT( 150, static_cast<int>(timer.now()) );
     ASSERT_GT( 250, static_cast<int>(timer.now()) );
 }
-#endif // of #ifdef TEST_WITH_WAIT
+#endif // of #if defined(TEST_WITH_WAIT) && defined(TEST_AFFECTED_BY_LOAD)
 
 
 

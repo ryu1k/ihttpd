@@ -12,7 +12,13 @@
 
 // Test with sleep or wait.
 // These test may take long.
+//  !! : These test may be affected by the system load
+//       even though IS_AFFECTED_BY_LOAD is not applied.
 #define TEST_WITH_WAIT
+
+// Test which may be affected by system load.
+// These test may fail under the high system load.
+#define TEST_AFFECTED_BY_LOAD
 
 
 // Show trace output from test thread.
