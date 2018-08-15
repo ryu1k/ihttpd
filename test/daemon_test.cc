@@ -180,9 +180,9 @@ void DaemonTest::run_listen_fails()
 }
 
 
-// Test of listen fail in daemon.run()
-//   After call of run(), daemon will listen.
-//   This test is the case of listen failes.
+// Stop daemon by breaking socket.
+//   After call of run(), we will close sp_ forcibly.
+//   This test is the case of error handling on broken socket.
 TEST(DaemonTest, run_socket_broken) {
     DaemonTest::run_socket_broken();
 }
@@ -273,7 +273,7 @@ void DaemonTest::listen_()
     }
 
     {
-        TRL_("check opening of the por indirectly by opening the port twice.\n");
+        TRL_("can open the port twice with SO_REUSEADDR.\n");
         Daemon daemon(OK_ADDR, TARGET_PORT);
         ASSERT_EQ(-1, daemon.sp_);
         ASSERT_EQ(true, daemon.listen_());
@@ -345,6 +345,7 @@ void DaemonTest::accept_()
 
     // need successful accept.
     timer.start();
+    ASSERT_EQ(false, daemon.running_);
     ASSERT_EQ(true, daemon.accept_one());
 
     // must have completed in 50 msec.
