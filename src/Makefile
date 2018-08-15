@@ -1,12 +1,12 @@
 
 
-CXXSRCS = ihttpd ihttpd_main utils daemon
+CXXSRCS = daemon ihttpd ihttpd_main task utils
 
 OBJS = ${CXXSRCS:%=%.o}
 
 INCLUDES = -I../include
 LIBS = -lboost_timer
-CXXFLAGS = -Wall ${INCLUDES}
+CXXFLAGS = -Wall -g ${INCLUDES}
 
 make: ihttpd
 

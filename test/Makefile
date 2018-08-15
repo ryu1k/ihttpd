@@ -13,7 +13,7 @@ GTEST_ALL_CXX=${GTEST_BASE_SRC}/build/googlemock/gtest/libgtest.a
 GTEST_MAIN=${GTEST_BASE_SRC}/build/googlemock/gtest/libgtest_main.a
 GTEST_LIBS=-lpthread -lboost_timer  -lboost_system
 
-GTEST_CFLAGS=-Wall ${GTEST_INCLUDES}
+GTEST_CFLAGS=-Wall -g ${GTEST_INCLUDES}
 GTEST_DRIVERS=${GTEST_ALL_CXX} ${GTEST_MAIN} ${GTEST_LIBS}
 
 TARGETS_CXX=${TARGETS:%=%.cc} 
@@ -54,7 +54,13 @@ test-all: clean test
 test: build
 	./test-all
 
-
+#
+# samples of valgrind test
+#  memory leak: make valgrind VGOPTS="--leak-check=full"
+#
+#  thread:      make valgrind VGOPTS="--tool=helgrind"
+#   helgrind reports running_ as Possible data race.
+#   We may have to use mutex and cv to erase it.
 valgrind-all: clean valgrind
 
 valgrind: build
