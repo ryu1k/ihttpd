@@ -208,7 +208,7 @@ void DaemonTest::run_socket_broken()
     ::close(daemon.sp_);
 
     // must exit run()
-    sleepmsec(daemon.tick_msec_);
+    sleepmsec(daemon.tick_msec_ * 2);
     ASSERT_EQ(false, daemon.running_);
 
     ASSERT_EQ(0, pthread_join(th, NULL));
